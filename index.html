@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>法律 Podcast｜開車聽考點</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--fg:#e6edf3;--dim:#8b949e;--acc:#f0b429;--acc2:#58a6ff;--ok:#3fb950}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 -apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+body{padding-bottom:calc(230px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:rgba(13,17,23,.96);padding:calc(10px + env(safe-area-inset-top)) 16px 0;border-bottom:1px solid var(--line)}
+h1{font-size:20px;margin:0 0 8px}
+h1 small{color:var(--dim);font-weight:400;font-size:14px;margin-left:6px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px}
+.tab{flex:0 0 auto;min-height:44px;padding:0 18px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:17px}
+.tab[aria-selected=true]{background:var(--acc);color:#111;border-color:var(--acc);font-weight:700}
+main{max-width:760px;margin:0 auto;padding:12px 12px 0}
+.tools{display:flex;gap:8px;justify-content:space-between;align-items:center;color:var(--dim);font-size:14px;margin:4px 4px 10px}
+.ep{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.ep.on{border-color:var(--acc)}
+.ep .go{flex:1;min-width:0;background:none;border:0;color:inherit;text-align:left;padding:0;font:inherit}
+.ep .t{font-size:18px;font-weight:700}
+.ep .s{color:var(--dim);font-size:14px;line-height:1.45}
+.ep .m{font-size:13px;color:var(--dim);margin-top:2px}
+.bar{height:4px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc2)}
+.dl{flex:0 0 auto;width:48px;height:48px;border-radius:12px;border:1px solid var(--line);background:#0d1117;color:var(--fg);font-size:20px}
+.dl.done{color:var(--ok);border-color:var(--ok)}
+.btn{min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:15px}
+#player{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#010409;border-top:1px solid var(--line);padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
+#player .now{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dim)}
+#player .now b{color:var(--fg)}
+#seek{width:100%;height:36px;margin:2px 0;accent-color:var(--acc)}
+.time{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-top:-6px}
+.ctl{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:4px}
+.ctl button{background:var(--card);border:1px solid var(--line);color:var(--fg);border-radius:50%;width:58px;height:58px;font-size:15px}
+.ctl #play{width:76px;height:76px;background:var(--acc);color:#111;border:0;font-size:30px}
+.ctl .sp{border-radius:14px;width:auto;min-width:64px;padding:0 10px;font-size:17px;font-weight:700}
+.row2{display:flex;justify-content:center;gap:10px;margin-top:8px}
+#sheet{position:fixed;inset:0;z-index:9;background:var(--bg);overflow:auto;display:none;padding:calc(12px + env(safe-area-inset-top)) 16px 40px}
+#sheet.open{display:block}
+#sheet h2{font-size:20px;margin:6px 0}
+#sheet .ln{padding:8px 10px;border-radius:10px;margin:2px 0}
+#sheet .ln.cur{background:#1f2a37}
+#sheet .who{font-weight:700;margin-right:6px}
+#sheet .who.m{color:var(--acc2)}#sheet .who.f{color:#f78166}
+#sheet .art{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;font-size:15px;white-space:pre-wrap}
+#sheet .close{position:sticky;top:0;float:right;min-height:48px;min-width:48px;font-size:22px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:250px;background:#30363d;padding:8px 16px;border-radius:20px;font-size:15px;display:none;z-index:10}
+@media (min-width:900px){main{padding-top:20px}.ep{padding:14px 16px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>法律 Podcast<small>開車聽考點・雙人對談</small></h1>
+  <div class="tabs" role="tablist" id="tabs"></div>
+</header>
+<main>
+  <div class="tools"><span id="count"></span><button class="btn" id="dlall">⬇ 本科全部離線</button></div>
+  <div id="list"></div>
+  <p style="color:var(--dim);font-size:13px;margin:16px 4px">內容來源：高大法律地圖題庫（考選部公告答案、全國法規資料庫現行條文）。語音為電腦合成。<a href="../pocket-exam-app/" style="color:var(--acc2)">回高大法律地圖</a></p>
+</main>
+<div id="player">
+  <div class="now" id="now">選一集開始聽</div>
+  <input type="range" id="seek" min="0" max="0" step="1" value="0" aria-label="播放進度">
+  <div class="time"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+  <div class="ctl">
+    <button id="back" aria-label="倒退15秒">⟲15</button>
+    <button id="play" aria-label="播放">▶</button>
+    <button id="fwd" aria-label="快轉15秒">15⟳</button>
+    <button id="speed" class="sp" aria-label="倍速">1.0×</button>
+  </div>
+  <div class="row2"><button class="btn" id="prev">⏮ 上一集</button><button class="btn" id="txt">逐字稿・條文</button><button class="btn" id="next">下一集 ⏭</button></div>
+</div>
+<div id="sheet" role="dialog" aria-label="逐字稿與條文"><button class="btn close" id="sclose" aria-label="關閉">✕</button><div id="sbody"></div></div>
+<div class="toast" id="toast"></div>
+<audio id="au" preload="metadata"></audio>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var au=$('au'),EP=[],cur=null,subj=localStorage.getItem('lp_subj')||'民法',SPEEDS=[1,1.25,1.5];
+var spd=parseFloat(localStorage.getItem('lp_speed')||'1');if(SPEEDS.indexOf(spd)<0)spd=1;
+var pos=JSON.parse(localStorage.getItem('lp_pos')||'{}');
+var have={},blobUrl=null;
+function fmt(s){s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
+function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(function(){e.style.display='none'},1800)}
+// ---- 離線：音檔存 IndexedDB（同網域其他 app 更新時會清 Cache Storage，IndexedDB 不受影響）----
+var dbp=new Promise(function(ok,no){var r=indexedDB.open('law-podcast',1);r.onupgradeneeded=function(){r.result.createObjectStore('audio')};r.onsuccess=function(){ok(r.result)};r.onerror=function(){no(r.error)}});
+function idb(mode,fn){return dbp.then(function(db){return new Promise(function(ok,no){var t=db.transaction('audio',mode),s=t.objectStore('audio'),r=fn(s);t.oncomplete=function(){ok(r&&r.result)};t.onerror=function(){no(t.error)}})})}
+function refreshHave(){return idb('readonly',function(s){return s.getAllKeys()}).then(function(ks){have={};(ks||[]).forEach(function(k){have[k]=1})}).catch(function(){})}
+function download(ep){
+  return fetch(ep.audio,{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){return idb('readwrite',function(s){return s.put({v:ep.v,blob:b},ep.id)})}).then(function(){have[ep.id]=1})
+}
+function removeDl(ep){return idb('readwrite',function(s){return s.delete(ep.id)}).then(function(){delete have[ep.id]})}
+function getBlob(ep){return idb('readonly',function(s){return s.get(ep.id)}).then(function(r){return r&&r.v===ep.v?r.blob:null}).catch(function(){return null})}
+// ---- 列表 ----
+function subjects(){var s=[];EP.forEach(function(e){if(s.indexOf(e.subj)<0)s.push(e.subj)});return s}
+function renderTabs(){$('tabs').innerHTML=subjects().map(function(s){return '<button class="tab" role="tab" aria-selected="'+(s===subj)+'" data-s="'+s+'">'+s+'</button>'}).join('')}
+function renderList(){
+  var L=EP.filter(function(e){return e.subj===subj});
+  $('count').textContent=subj+' '+L.length+' 集・已離線 '+L.filter(function(e){return have[e.id]}).length;
+  $('list').innerHTML=L.map(function(e){var p=pos[e.id]||0,pc=Math.min(100,Math.round(p/e.dur*100));
+    return '<div class="ep'+(cur&&cur.id===e.id?' on':'')+'"><button class="go" data-id="'+e.id+'"><div class="t">'+e.no+'｜'+e.title+'</div><div class="s">'+e.summary+'</div><div class="m">'+fmt(e.dur)+(p>5?'・聽到 '+fmt(p):'')+(have[e.id]?'・已離線':'')+'</div><div class="bar"><i style="width:'+pc+'%"></i></div></button><button class="dl'+(have[e.id]?' done':'')+'" data-dl="'+e.id+'" aria-label="'+(have[e.id]?'已離線，點一下刪除':'離線下載')+'">'+(have[e.id]?'✓':'⬇')+'</button></div>'}).join('');
+}
+$('tabs').onclick=function(ev){var b=ev.target.closest('[data-s]');if(!b)return;subj=b.dataset.s;localStorage.setItem('lp_subj',subj);renderTabs();renderList();window.scrollTo(0,0)};
+$('list').onclick=function(ev){
+  var g=ev.target.closest('[data-id]'),d=ev.target.closest('[data-dl]');
+  if(d){var e=byId(d.dataset.dl);if(have[e.id]){if(confirm('刪除「'+e.title+'」的離線檔？'))removeDl(e).then(renderList)}else{d.textContent='…';download(e).then(function(){toast('已離線：'+e.title);renderList()}).catch(function(){toast('下載失敗，請確認網路');renderList()})}return}
+  if(g){load(byId(g.dataset.id),true)}
+};
+$('dlall').onclick=function(){var L=EP.filter(function(e){return e.subj===subj&&!have[e.id]});if(!L.length){toast('本科都已離線');return}
+  var i=0;(function n(){if(i>=L.length){toast(subj+' 全部離線完成');renderList();return}$('dlall').textContent='下載中 '+(i+1)+'/'+L.length;download(L[i]).then(function(){i++;renderList();n()}).catch(function(){toast('下載中斷，請確認網路');renderList()}).then(function(){if(i>=L.length)$('dlall').textContent='⬇ 本科全部離線'})})()};
+function byId(id){for(var i=0;i<EP.length;i++)if(EP[i].id===id)return EP[i]}
+// ---- 播放 ----
+function savePos(){if(cur&&au.currentTime>0){pos[cur.id]=au.ended?0:au.currentTime;localStorage.setItem('lp_pos',JSON.stringify(pos));localStorage.setItem('lp_last',cur.id)}}
+function load(e,autoplay){
+  savePos();cur=e;localStorage.setItem('lp_last',e.id);
+  $('now').innerHTML='<b>'+e.subj+' '+e.no+'</b>｜'+e.title;
+  if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null}
+  getBlob(e).then(function(b){
+    if(b){blobUrl=URL.createObjectURL(b);au.src=blobUrl}else au.src=e.audio;
+    au.playbackRate=spd;au.defaultPlaybackRate=spd;
+    var start=pos[e.id]||0;
+    au.addEventListener('loadedmetadata',function f(){au.removeEventListener('loadedmetadata',f);if(start>3&&start<au.duration-3)au.currentTime=start;au.playbackRate=spd});
+    if(autoplay)au.play().catch(function(){});
+    media();renderList();if($('sheet').classList.contains('open'))sheet();
+  });
+}
+function media(){if(!('mediaSession' in navigator)||!cur)return;
+  navigator.mediaSession.metadata=new MediaMetadata({title:cur.no+' '+cur.title,artist:'法律 Podcast・'+cur.subj,album:'高大法律地圖',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]});
+  var h={play:function(){au.play()},pause:function(){au.pause()},seekbackward:function(){skip(-15)},seekforward:function(){skip(15)},previoustrack:function(){step(-1)},nexttrack:function(){step(1)},seekto:function(d){au.currentTime=d.seekTime}};
+  for(var k in h){try{navigator.mediaSession.setActionHandler(k,h[k])}catch(x){}}
+}
+function skip(s){if(!cur)return;au.currentTime=Math.max(0,Math.min((au.duration||0)-0.5,au.currentTime+s))}
+function step(d){if(!cur)return;var L=EP.filter(function(e){return e.subj===cur.subj}),i=L.indexOf(cur)+d;if(i>=0&&i<L.length)load(L[i],true)}
+$('play').onclick=function(){if(!cur){var L=EP.filter(function(e){return e.subj===subj});load(L[0],true);return}au.paused?au.play():au.pause()};
+$('back').onclick=function(){skip(-15)};$('fwd').onclick=function(){skip(15)};
+$('prev').onclick=function(){step(-1)};$('next').onclick=function(){step(1)};
+$('speed').onclick=function(){spd=SPEEDS[(SPEEDS.indexOf(spd)+1)%SPEEDS.length];au.playbackRate=spd;au.defaultPlaybackRate=spd;localStorage.setItem('lp_speed',spd);$('speed').textContent=spd.toFixed(spd===1.25?2:1)+'×'};
+$('speed').textContent=spd.toFixed(spd===1.25?2:1)+'×';
+var dragging=false;
+$('seek').oninput=function(){dragging=true;$('cur').textContent=fmt(+this.value)};
+$('seek').onchange=function(){au.currentTime=+this.value;dragging=false;savePos()};
+au.addEventListener('play',function(){$('play').textContent='❚❚';$('play').setAttribute('aria-label','暫停')});
+au.addEventListener('pause',function(){$('play').textContent='▶';$('play').setAttribute('aria-label','播放');savePos();renderList()});
+au.addEventListener('loadedmetadata',function(){$('seek').max=Math.floor(au.duration);$('dur').textContent=fmt(au.duration)});
+var lastSave=0;
+au.addEventListener('timeupdate',function(){if(!dragging){$('seek').value=Math.floor(au.currentTime);$('cur').textContent=fmt(au.currentTime)}
+  if(Date.now()-lastSave>4000){lastSave=Date.now();savePos()}hl()});
+au.addEventListener('ended',function(){pos[cur.id]=0;localStorage.setItem('lp_pos',JSON.stringify(pos));step(1)});
+document.addEventListener('visibilitychange',savePos);window.addEventListener('pagehide',savePos);
+// ---- 逐字稿・條文 ----
+var curLn=-1;
+function sheet(){if(!cur)return;var e=cur;
+  $('sbody').innerHTML='<h2>'+e.subj+' '+e.no+'｜'+e.title+'</h2><p style="color:var(--dim)">點任一句可跳到那裡播放。</p>'+
+  e.lines.map(function(l,i){return '<div class="ln" data-i="'+i+'"><span class="who '+(l.sp==='男'?'m':'f')+'">'+(l.sp==='男'?'阿哲':'小晴')+'</span>'+l.t+'</div>'}).join('')+
+  '<h2 style="margin-top:24px">對應條文（現行條文原文）</h2>'+e.articles.map(function(a){return '<div class="art"><b>'+a.law+' '+a.no+'</b>\n'+a.text+'</div>'}).join('');
+  curLn=-1;hl(true)}
+function hl(force){if(!cur||!$('sheet').classList.contains('open'))return;var t=au.currentTime,i=0;
+  for(var k=0;k<cur.marks.length;k++){if(cur.marks[k].start<=t+0.05)i=k;else break}
+  if(i===curLn&&!force)return;var o=document.querySelector('#sbody .ln.cur');if(o)o.classList.remove('cur');curLn=i;
+  var n=document.querySelector('#sbody .ln[data-i="'+i+'"]');if(n){n.classList.add('cur');n.scrollIntoView({block:'center',behavior:force?'auto':'smooth'})}}
+$('txt').onclick=function(){if(!cur){toast('先選一集');return}$('sheet').classList.add('open');sheet()};
+$('sclose').onclick=function(){$('sheet').classList.remove('open')};
+$('sbody').onclick=function(ev){var l=ev.target.closest('.ln');if(!l||!cur)return;au.currentTime=cur.marks[+l.dataset.i].start;if(au.paused)au.play()};
+// ---- 開機 ----
+fetch('episodes.json',{cache:'no-cache'}).then(function(r){return r.json()}).catch(function(){return caches.match('episodes.json').then(function(r){return r.json()})}).then(function(d){
+  EP=d.episodes;if(subjects().indexOf(subj)<0)subj=subjects()[0];
+  return refreshHave().then(function(){renderTabs();renderList();var last=byId(localStorage.getItem('lp_last'));if(last)load(last,false)});
+});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+})();
+</script>
+</body>
+</html>
